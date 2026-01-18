@@ -1,28 +1,21 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using System.Runtime.CompilerServices;
 using DSP_Speed_and_Consumption_Tweaks.Patches;
 using HarmonyLib;
-using HarmonyLib.Tools;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System;
-using System.IO;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
-using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using System.Text;
-using System.Reflection.Emit;
-using System.Diagnostics.Eventing.Reader;
 
 namespace DSP_Speed_and_Consumption_Tweaks
 {
     // TODO Review this file and update to your own requirements.
     
-    [BepInPlugin(MyGUID, PluginName, VersionString)]
+    [BepInPlugin(ManifesteInfos.GUID, ManifesteInfos.PluginName, ManifesteInfos.VersionString)]
     [BepInProcess("DSPGAME.exe")]
     //[BepInDependency("dsp.galactic-scale.2")]
     public class DSP_Speed_and_Consumption_Tweaks_Plugin : BaseUnityPlugin
@@ -152,114 +145,6 @@ namespace DSP_Speed_and_Consumption_Tweaks
         }
         #region Fields
 
-        /// <summary>
-        /// Returns the Neibouring instructions in CSV format
-        /// </summary>
-        /// <param name="codeMatcher"></param>
-        /// <param name="NumberOfNeibouringInstructions"></param>
-        public static StringCollection returnInstructions(
-            ref CodeMatcher codeMatcher, 
-            int NumberOfNeibouringInstructions = 100000, 
-            int expectedInstructionPosition = -1,
-            [CallerMemberName] string functionName = "")
-        {
-            StringCollection instructions = new StringCollection();
-            int min = (
-                codeMatcher.Pos > NumberOfNeibouringInstructions + 1
-                    ? -(NumberOfNeibouringInstructions + 1)
-                    : -codeMatcher.Pos
-            );
-            int max = (
-                NumberOfNeibouringInstructions + codeMatcher.Pos + 1 > codeMatcher.Length - 1
-                    ? codeMatcher.Length - (codeMatcher.Pos + 1)
-                    : NumberOfNeibouringInstructions + 1
-            );
-
-            if (DEBUG)
-            {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"*codeMatcher.Pos = {codeMatcher.Pos} and codeMatcher.Length = {codeMatcher.Length}");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"*            min = {min}                                max = {max} ");
-            }
-
-            int instructionPos = expectedInstructionPosition == -1 ? codeMatcher.Pos : expectedInstructionPosition;
-            int lastInstructionPos = codeMatcher.Length;
-            bool inRange = false;
-            List<ExpextedInstruction> expectedRegion = expextedInstructionsList.Where(x =>
-                        x.functionName == functionName
-                        && x.expectedInstructionPosition >= (instructionPos + min >= 0 ? instructionPos + min : 0)
-                        && x.expectedInstructionPosition <= (instructionPos + max < lastInstructionPos ? lastInstructionPos : instructionPos + max)
-                    ).ToList();
-            for (int i = min; i <= max; i++)
-            {
-                inRange = expectedRegion.Count >  i - min
-                       && 0                  <= i - min;
-                if (inRange)
-                {
-                    instructions.Add(
-                        $"{functionName, -50}," +
-                        $"{(i == 0 ? ">>>>" : ""),-4}," +
-                        $"{codeMatcher.Pos + i, -4}, " +
-                        $"{codeMatcher.InstructionAt(i).opcode, -10}, " +
-                        $"\"{codeMatcher.InstructionAt(i).operand, -50}\"," +
-                        $"{(expectedRegion[i - min].expectedInstructionPosition == expectedInstructionPosition ? ">>>>" : ""),-4}," +
-                        $"{expectedRegion[i - min].expectedInstructionPosition, -4}, " +
-                        $"{expectedRegion[i - min].expectedOpcode, -10}, " +
-                        $"\"{expectedRegion[i - min].expectedOperand, -50}\""
-                    );
-                }
-                else
-                {
-                    instructions.Add(
-                        $"{functionName, -50}," +
-                        $"{(i == 0 ? ">>>>" : ""),-4}," +
-                        $"{codeMatcher.Pos + i,-4}, " +
-                        $"{codeMatcher.InstructionAt(i).opcode,-10}, " +
-                        $"\"{codeMatcher.InstructionAt(i).operand,-50}\"," +
-                        $"None," +
-                        $"None," +
-                        $"None      ," +
-                        $"None                                              "
-                    );
-                }
-                foreach (Label label in codeMatcher.InstructionAt(i).labels)
-                    instructions.Add($"    label: {label, 70}");
-            }
-            
-            return instructions;
-        }
-
-        private static int sizeOperand(string operandType)
-        {
-            switch (operandType)
-            {
-                case "Int32":
-                case "System.Int32":
-                case "Single":
-                case "System.Single":
-                    return 4;
-                case "Double":
-                case "System.Double":
-                case "Long":
-                case "System.Long":
-                    return 8;
-                default:
-                    return 0;
-            }
-        }
-
-        private static int sizeInstruction(CodeInstruction instruction)
-        {
-            Regex regex = new Regex(@"[0-9A-Za-z.]+");
-            Match match = regex.Match(instruction.operand.ToString());
-            int size = 0;
-            if (instruction.opcode == OpCodes.Call
-                || instruction.opcode == OpCodes.Callvirt
-                || instruction.opcode == OpCodes.Newobj
-                || instruction.opcode == OpCodes.Calli) size = 5; // instruction always 1 Byte and 4 Bytes adresse of function
-            
-            else size = 1;
-            return size;
-        }
 
         // Mod specific details. MyGUID should be unique, and follow the reverse domain pattern
         // e.g.
@@ -267,9 +152,6 @@ namespace DSP_Speed_and_Consumption_Tweaks
         // Version should be a valid version string.
         // e.g.
         // 1.0.0
-        private const string MyGUID = "com.hiul.DSP_Speed_and_Consumption_Tweaks";
-        private const string PluginName = "DSP_Speed_and_Consumption_Tweaks";
-        public const string VersionString = "1.5.1";
         public static bool DEBUG = true;
         public static StringCollection expectedInstructions = null;
         public static string pluginPath = "";
@@ -309,18 +191,19 @@ namespace DSP_Speed_and_Consumption_Tweaks
         public void Awake()
         {
             Log = base.Logger;
-
+            var configfile = new ConfigFile(Utility.CombinePaths(Paths.ConfigPath, MetadataHelper.GetMetadata(this).GUID + ".cfg"), false, MetadataHelper.GetMetadata(this));
+            configfile.SaveOnConfigSet = true;
             //DSP_Speed_and_Consumption_Tweaks_Plugin.LogError();
-            Harmony harmony = new Harmony(MyGUID);
+            Harmony harmony = new Harmony(ManifesteInfos.GUID);
 
             //DSP_Speed_and_Consumption_Tweaks_Plugin.LogError();
             
 
             //DSP_Speed_and_Consumption_Tweaks_Plugin.LogError();
-            DSP_Speed_and_Consumption_Tweaks.Config.Init(Config);
+            DSP_Config.Init(Config);
 
             //DSP_Speed_and_Consumption_Tweaks_Plugin.LogError();
-            DEBUG = DSP_Speed_and_Consumption_Tweaks.Config.Debug_CONFIG.DEBUG.Value;
+            DEBUG = DSP_Config.Debug_CONFIG.DEBUG.Value;
 
             //DSP_Speed_and_Consumption_Tweaks_Plugin.LogError();
             pluginPath = Path.GetDirectoryName(this.Info.Location);
@@ -426,79 +309,130 @@ namespace DSP_Speed_and_Consumption_Tweaks
 
             if (DEBUG)
             {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+---------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("|    Patching GameHistoryData     |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+---------------------------------+");
+                Log.LogInfo("+-------------------------------+");
+                Log.LogInfo("|    Patching ConfigsPatches    |");
+                Log.LogInfo("+-------------------------------+");
             }
             try
             {
-                harmony.PatchAll(typeof(MyGameHistoryData));
+                harmony.PatchAll(typeof(ConfigsPatches));
             }
             catch (Exception e)
             {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError("+--------------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError("|    Patching GameHistoryData Error    |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError("+--------------------------------------+");
-                foreach (var item in e.Data)
-                {
-                    DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError($"|    item : {item.ToString()}      |");
-                }
-            }
-            
-            if (DEBUG)
-            {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("|             Patching Mecha             |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-            }
-            harmony.PatchAll(typeof(MyMecha));
+                Log.LogError("+-------------------------------+");
+                Log.LogError("| Patching ConfigsPatches Error |");
+                Log.LogError("+-------------------------------+");
 
-            if (DEBUG)
-            {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("|        Pacthing PlayerControler        |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-            }
-            harmony.PatchAll(typeof(MyPlayerMove_Sail));
-            if (DEBUG)
-            {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("|        Patching StationComponent       |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-            }
-            try
-            {
-                harmony.PatchAll(typeof(MyStationComponent));
-            }
-            catch (Exception e)
-            {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError("+--------------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError("|    Patching StationComponent Error   |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError("+--------------------------------------+");
-
-                
                 foreach (var item in e.InnerException.Data)
                 {
-                    DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError($"|    item : {item.ToString()}      |");
+                    Log.LogError($"|    item : {item.ToString()}      |");
                 }
+                Log.LogError(e.ToString());
             }
-            
 
             if (DEBUG)
             {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("|        Patching DFRelayComponent       |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
+                Log.LogInfo("+----------------------------------------+");
+                Log.LogInfo("|    Patching StationComponentPatches    |");
+                Log.LogInfo("+----------------------------------------+");
             }
-            harmony.PatchAll(typeof(MyDFRelayComponent));
-
-            if (DEBUG)
+            try
             {
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("|       Patching MyDFTinderComponent     |");
-                DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("+----------------------------------------+");
+                harmony.PatchAll(typeof(StationComponentPatches));
             }
-            harmony.PatchAll(typeof(MyDFTinderComponent));
+            catch (Exception e)
+            {
+                Log.LogError("+----------------------------------------+");
+                Log.LogError("| Patching StationComponentPatches Error |");
+                Log.LogError("+----------------------------------------+");
+
+                foreach (var item in e.InnerException.Data)
+                {
+                    Log.LogError($"|    item : {item.ToString()}      |");
+                }
+                Log.LogError(e.ToString());
+            }
+
+            try
+            {
+                Log.LogInfo("+-----------------------+");
+                Log.LogInfo("| Patching MechaPatches |");
+                Log.LogInfo("+-----------------------+");
+                harmony.PatchAll(typeof(MechaPatches));
+            }
+            catch (Exception e)
+            {
+                Log.LogError("+-----------------------------+");
+                Log.LogError("| Patching MechaPatches Error |");
+                Log.LogError("+-----------------------------+");
+
+
+                foreach (var item in e.InnerException.Data)
+                {
+                    Log.LogError($"|    item : {item.ToString()}      |");
+                }
+                Log.LogError(e.ToString());
+            }
+
+            try
+            {
+                Log.LogInfo("+----------------------------------------+");
+                Log.LogInfo("|        Patching DFRelayComponent       |");
+                Log.LogInfo("+----------------------------------------+");
+                harmony.PatchAll(typeof(ExtraDFRelayComponentPatches));
+            }
+            catch (Exception e)
+            {
+                Log.LogError("+---------------------------------+");
+                Log.LogError("| Patching DFRelayComponent Error |");
+                Log.LogError("+---------------------------------+");
+
+                foreach (var item in e.InnerException.Data)
+                {
+                    Log.LogError($"|    item : {item.ToString()}      |");
+                }
+                Log.LogError(e.ToString());
+            }
+
+            try
+            {
+                Log.LogInfo("+-----------------------------------------+");
+                Log.LogInfo("|        Patching DFTinderComponent       |");
+                Log.LogInfo("+-----------------------------------------+");
+                harmony.PatchAll(typeof(ExtraDFTinderComponentPatch));
+            }
+            catch (Exception e)
+            {
+                Log.LogError("+----------------------------------+");
+                Log.LogError("| Patching DFTinderComponent Error |");
+                Log.LogError("+----------------------------------+");
+
+                foreach (var item in e.InnerException.Data)
+                {
+                    Log.LogError($"|    item : {item.ToString()}      |");
+                }
+                Log.LogError(e.ToString());
+            }
+
+            try
+            {
+                Log.LogInfo("+-----------------------------------+");
+                Log.LogInfo("|        Patching PrefabPatch       |");
+                Log.LogInfo("+-----------------------------------+");
+                harmony.PatchAll(typeof(ExtraPrefabPatch));
+            }
+            catch (Exception e)
+            {
+                Log.LogError("+----------------------------+");
+                Log.LogError("| Patching PrefabPatch Error |");
+                Log.LogError("+----------------------------+");
+
+                foreach (var item in e.InnerException.Data)
+                {
+                    Log.LogError($"|    item : {item.ToString()}      |");
+                }
+                Log.LogError(e.ToString());
+            }
         }
         public void Start()
         {
