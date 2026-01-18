@@ -1,14 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using HarmonyLib;
-using UnityEngine;
-using static DSP_Speed_and_Consumption_Tweaks.Config;
 using static DSP_Speed_and_Consumption_Tweaks.DSP_Speed_and_Consumption_Tweaks_Plugin;
 
 namespace DSP_Speed_and_Consumption_Tweaks.Patches
@@ -45,7 +42,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
 
             // replace takeoff cost and flight cost with custom values
             var matcher = new CodeMatcher(codeInstructions, il);
-                
+
 
             if (DSP_Speed_and_Consumption_Tweaks_Plugin.DEBUG)
             {
@@ -117,7 +114,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 {
                     DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"-------------  after  -------------");
                     foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: 114))
-                        DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"{expectedInstruction}"); 
+                        DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"{expectedInstruction}");
                 }
             }
             else
@@ -131,12 +128,12 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
             while (matcher.Pos < instructions.Count() && patches < 2)
             {
                 matcher.MatchForward(true,
-                    new CodeMatch(i => i.opcode == OpCodes.Stloc_S && (i.operand.ToString() == "System.Double (37)" || i.operand.ToString() == "System.Double (56)")),
-                    new CodeMatch(i => i.opcode == OpCodes.Ldloc_S && (i.operand.ToString() == "System.Double (35)" || i.operand.ToString() == "System.Double (54)")),
+                    new CodeMatch(i => i.opcode == OpCodes.Stloc_S && (i.operand.ToString() == "System.Double (39)" || i.operand.ToString() == "System.Double (58)")),
                     new CodeMatch(i => i.opcode == OpCodes.Ldloc_S && (i.operand.ToString() == "System.Double (37)" || i.operand.ToString() == "System.Double (56)")),
+                    new CodeMatch(i => i.opcode == OpCodes.Ldloc_S && (i.operand.ToString() == "System.Double (39)" || i.operand.ToString() == "System.Double (58)")),
                     new CodeMatch(i => i.opcode == OpCodes.Mul),
-                    new CodeMatch(i => i.opcode == OpCodes.Stloc_S && (i.operand.ToString() == "System.Double (38)" || i.operand.ToString() == "System.Double (57)")),
-                    new CodeMatch(i => i.opcode == OpCodes.Ldloc_S && (i.operand.ToString() == "System.Double (38)" || i.operand.ToString() == "System.Double (57)"))
+                    new CodeMatch(i => i.opcode == OpCodes.Stloc_S && (i.operand.ToString() == "System.Double (40)" || i.operand.ToString() == "System.Double (59)")),
+                    new CodeMatch(i => i.opcode == OpCodes.Ldloc_S && (i.operand.ToString() == "System.Double (40)" || i.operand.ToString() == "System.Double (59)"))
                 );
                 if (matcher.IsValid)
                 {
@@ -144,29 +141,29 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                     if (DSP_Speed_and_Consumption_Tweaks_Plugin.DEBUG)
                     {
                         DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"----- drone energy per meter ------");
-                        DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"------ drone takeoff energy { patches + 1} ---");
+                        DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"------ drone takeoff energy {patches + 1} ---");
                         DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"-------------  before  ------------");
-                        foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: (patches == 1) ? 365 : 846 ))
+                        foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: (patches == 1) ? 385 : 906))
                             DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"{expectedInstruction}");
                     }
                     matcher.Advance(1);
                     matcher.Set(OpCodes.Ldc_R8, DroneEnergyPerMeter);
                     matcher.Advance(4);
                     matcher.Set(OpCodes.Ldc_R8, DroneEnergyTakeOff);
-                    
+
                     matcher.Advance(-5);
                     if (DSP_Speed_and_Consumption_Tweaks_Plugin.DEBUG)
                     {
                         DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"-------------  after  -------------");
-                        foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: (patches == 1) ? 365 : 846))
+                        foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: (patches == 1) ? 385 : 906))
                             DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"{expectedInstruction}");
                     }
                 }
                 else
                 {
-                    foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 20, expectedInstructionPosition: (patches == 1) ? 365 : 846))
+                    foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 20, expectedInstructionPosition: (patches == 1) ? 385 : 906))
                         DSP_Speed_and_Consumption_Tweaks_Plugin.LogError($"{expectedInstruction}");
-                    
+
                     return codeInstructions;
                 }
             }
@@ -186,9 +183,10 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"-------------  before  ------------");
                 foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: 39))
                     DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"{expectedInstruction}");
-                
+
             }
-            if (matcher.IsValid){
+            if (matcher.IsValid)
+            {
                 matcher.Set(
                     OpCodes.Ldc_R4, (float)(maxDroneTaxiSpeed * 8.0)
                 );
@@ -201,14 +199,14 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
             }
             else
             {
-                
+
                 foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 20, expectedInstructionPosition: 39))
                     DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError($"{expectedInstruction}");
 
                 return codeInstructions;
             }
             matcher.MatchForward(true,
-                new CodeMatch(OpCodes.Ldc_R4, (float) 1f / 60f),
+                new CodeMatch(OpCodes.Ldc_R4, (float)1f / 60f),
                 new CodeMatch(OpCodes.Ldarg_S),
                 new CodeMatch(OpCodes.Mul),
                 new CodeMatch(OpCodes.Stloc_S)
@@ -298,12 +296,12 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 }
             }
 
-            
+
             int patches = 0;
             while (matcher.Pos < instructions.Count() && patches < 2)
             {
                 matcher.MatchForward(true,
-                    new CodeMatch(i => i.opcode == OpCodes.Ldc_I4 && ( Convert.ToInt32(i.operand) == 6000000))
+                    new CodeMatch(i => i.opcode == OpCodes.Ldc_I4 && (Convert.ToInt32(i.operand) == 6000000))
                 );
                 if (matcher.IsValid)
                 {
@@ -312,7 +310,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                         DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"------- vessels energy takeoff -------");
                         DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"--------------- before ---------------");
                         expectedInstructions = DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: (patches == 0) ? 393 : 762);
-                        
+
                         foreach (string expectedInstruction in expectedInstructions)
                             DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($" {expectedInstruction}");
                     }
@@ -320,7 +318,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                     if (DSP_Speed_and_Consumption_Tweaks_Plugin.DEBUG)
                     {
                         DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"---------------  after ---------------");
-                        
+
                         foreach (string expectedInstruction in DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 5, expectedInstructionPosition: (patches == 0) ? 393 : 762))
                             DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($" {expectedInstruction}");
                     }
@@ -391,7 +389,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 }
             }
 
-            
+
             matcher.MatchForward(true,
                 new CodeMatch(i => i.opcode == OpCodes.Ldc_R8 && (Convert.ToDouble(i.operand) == 1.5)),
                 new CodeMatch(OpCodes.Ldarg_2)
@@ -449,7 +447,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 }
 
             }
-            
+
             if (matcher.IsInvalid)
             {
                 DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogError($"No match found in InternalTickLocal_Transpiler code incompatible with mod Version {DSP_Speed_and_Consumption_Tweaks_Plugin.VersionString}");
@@ -461,7 +459,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
             }
 
             return matcher.InstructionEnumeration();
-            
+
 
         }
 
@@ -554,7 +552,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
             }
 
 
-            
+
             double maxCruiseShipSpeed = (double)Config.Logistic_SHIP_CONFIG.ShipMaxCruiseSpeed.Value * (
                 Config.Logistic_SHIP_CONFIG.ShipMaxCruiseSpeedUnits.Value == "LY" ? Config.LY
                 : Config.Logistic_SHIP_CONFIG.ShipMaxCruiseSpeedUnits.Value == "AU" ? Config.AU
@@ -633,9 +631,9 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                             DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($" {expectedInstruction}");
                     }
 
-                    
 
-                    
+
+
 
                     matcher.MatchForward(true,
                         new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && Convert.ToSingle(i.operand) == 6f),   //ldc.r4 6
@@ -675,8 +673,8 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                             foreach (string expectedInstruction in expectedInstructions)
                                 DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($" {expectedInstruction}");
                         }
-                        
-                        
+
+
                         matcher.MatchForward(true,
                             new CodeMatch(i => i.opcode == OpCodes.Ldc_R4 && Convert.ToSingle(i.operand) == 0.016666668f),    //ldc.r4 0.016666668
                             new CodeMatch(i => i.opcode == OpCodes.Ldloc_S)                                                  //ldloc.s 9
@@ -710,18 +708,18 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 }
             }
 
-            
+
             if (matcher.IsInvalid)
             {
-                    
+
                 DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($"---------------------  failed  ---------------------");
                 expectedInstructions = DSP_Speed_and_Consumption_Tweaks_Plugin.returnInstructions(ref matcher, 20, expectedInstructionPosition: 177);
                 foreach (string expectedInstruction in expectedInstructions)
                     DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo($" {expectedInstruction}");
-                    
+
                 return codeInstructions;
             }
-            
+
             return matcher.InstructionEnumeration();
 
         }
@@ -739,7 +737,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
             var codeInstructions = instructions as CodeInstruction[] ?? instructions.ToArray();
             float shipSailSpeed = (float)Config.Logistic_SHIP_CONFIG.ShipMaxCruiseSpeed.Value;
             StringCollection expectedInstructions;
-            
+
             var matcher = new CodeMatcher(codeInstructions, il);
 
             double maxCruiseShipSpeed = (double)Config.Logistic_SHIP_CONFIG.ShipMaxCruiseSpeed.Value * (
@@ -887,7 +885,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                     }
 
                 }
-                   
+
             }
 
             if (matcher.IsInvalid)
@@ -965,7 +963,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                     }
 
                 }
-                    
+
             }
 
             for (int i = 1; i <= 4; i++)
@@ -1024,7 +1022,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
 
 
                 matcher.Advance(-2);
-                matcher.Set(opcode: OpCodes.Ldc_R4, operand: (float)(shipApprochSpeed/600.0));
+                matcher.Set(opcode: OpCodes.Ldc_R4, operand: (float)(shipApprochSpeed / 600.0));
 
                 if (DSP_Speed_and_Consumption_Tweaks_Plugin.DEBUG)
                 {

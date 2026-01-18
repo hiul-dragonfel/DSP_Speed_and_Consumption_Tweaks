@@ -4,7 +4,7 @@
 	"author":"Hiul_Dragonfel",
     "name": "DSP_Speed_and_Consumption_Tweaks",
     "description": "This mod will tweak the speed and consumption of energy of drones, vessels, Icarus and Dark Fog seeds, relay and carrier according to config file.",
-    "version_number": "1.5.1",
+    "version_number": "1.5.2",
 	"dependencies": [
 		"xiaoye97-BepInEx-5.4.17"
 	],

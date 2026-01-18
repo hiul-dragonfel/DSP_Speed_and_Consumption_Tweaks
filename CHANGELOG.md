@@ -1,3 +1,5 @@
+v 1.5.2 Fixed indexes and values for changing energy consumption of vessels and drones in v0.10.32.25779.
+
 v 1.5.1	Corrected an error in the code that removed tech level improvment to drone speed.
 		Techlevel will apply correctly now. (carefull if you made the base speed high concider reducing it to more appropriate levels)
 
