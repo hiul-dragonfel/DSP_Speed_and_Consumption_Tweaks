@@ -13,7 +13,7 @@ If you have any suggestions your welcome to find me on discord
 here > https://discord.gg/BHCZ67hN
 or on the discord > DSP_Modding 
 
-v 2.1.0 Added the possibility to change the travelling speed of the solar array bullets and node rockets
+v 2.1.0 Added the possibility to change the travelling speed of the solar sail bullets and node rockets
 
 v 2.0.1 changes now affect loaded saves
 
