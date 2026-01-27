@@ -433,6 +433,26 @@ namespace DSP_Speed_and_Consumption_Tweaks
                 }
                 Log.LogError(e.ToString());
             }
+
+            try
+            {
+                Log.LogInfo("+-----------------------------------+");
+                Log.LogInfo("| Patching DysonSphere & DysonSwarm |");
+                Log.LogInfo("+-----------------------------------+");
+                harmony.PatchAll(typeof(ExtraDysonSphere));
+            }
+            catch (Exception e)
+            {
+                Log.LogError("+-----------------------------------------+");
+                Log.LogError("| Patching DysonSphere & DysonSwarm Error |");
+                Log.LogError("+-----------------------------------------+");
+
+                foreach (var item in e.InnerException.Data)
+                {
+                    Log.LogError($"|    item : {item.ToString()}      |");
+                }
+                Log.LogError(e.ToString());
+            }
         }
         public void Start()
         {

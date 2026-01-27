@@ -91,31 +91,31 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
             __result.mechaWarpSpeedMax = (float)(1_000_000 * Mecha_WARP_CONFIG.maxWarpSpeedMultiplier.Value);
         }
 
-        [HarmonyPatch(typeof(Mecha), nameof(Mecha.Import))]
+        [HarmonyPatch(typeof(GameData), nameof(GameData.Import))]
         [HarmonyPostfix]
-        public static void postfix_import(Mecha __instance)
+        public static void postfix_Gamedata_import(GameData __instance)
         {
             if (freeModePost)
             {
                 Log.LogInfo("+------------------------------------+");
-                Log.LogInfo("|            MechaPatches            |");
-                Log.LogInfo("| In Configs.freeMode method Postfix |");
+                Log.LogInfo("|      postfix_Gamedata_import       |");
+                Log.LogInfo("|     In GameData method Postfix     |");
                 Log.LogInfo("+------------------------------------+");
                 freeModePost = false;
             }
 
-            Log.LogInfo($"thrusterLevel = {__instance.thrusterLevel}");
-
-            __instance.walkPower = 15_000 * Mecha_LAND_CONFIG.WalkEnergyCostMultiplier.Value;
-            __instance.jumpEnergy = 25_000 * Mecha_LAND_CONFIG.JumpEnergyMultiplier.Value;
-            __instance.thrustPowerPerAcc = 24_000 * Mecha_CRUISE_CONFIG.CruiseAccelerationEnergyCostMultiplier.Value;
-            __instance.warpStartPowerPerSpeed = 1_600 * Mecha_WARP_CONFIG.warpStartPowerConsumptionMultiplier.Value;
-            __instance.warpKeepingPowerPerSpeed = 100 * Mecha_WARP_CONFIG.warpKeepingConsumptionMultiplier.Value;
-
-            __instance.walkSpeed = (float)(5.0 * Mecha_LAND_CONFIG.WalkSpeedMultiplier.Value);
-            __instance.jumpSpeed = (float)(32.0 * Mecha_LAND_CONFIG.JumpSpeedMultiplier.Value);
-            __instance.maxSailSpeed = (float)(1_000 * Mecha_CRUISE_CONFIG.CruiseMaxSpeedMultiplier.Value);
-            __instance.maxWarpSpeed = (float)(1_000_000 * Mecha_WARP_CONFIG.maxWarpSpeedMultiplier.Value);
+            __instance.mainPlayer.mecha.walkPower = 15_000 * Mecha_LAND_CONFIG.WalkEnergyCostMultiplier.Value;
+            __instance.mainPlayer.mecha.jumpEnergy = 25_000 * Mecha_LAND_CONFIG.JumpEnergyMultiplier.Value;
+            __instance.mainPlayer.mecha.thrustPowerPerAcc = 24_000 * Mecha_CRUISE_CONFIG.CruiseAccelerationEnergyCostMultiplier.Value;
+            __instance.mainPlayer.mecha.warpStartPowerPerSpeed = 1_600 * Mecha_WARP_CONFIG.warpStartPowerConsumptionMultiplier.Value;
+            __instance.mainPlayer.mecha.warpKeepingPowerPerSpeed = 100 * Mecha_WARP_CONFIG.warpKeepingConsumptionMultiplier.Value;
+                  
+            
+            __instance.mainPlayer.mecha.jumpSpeed = (float)(32.0 * Mecha_LAND_CONFIG.JumpSpeedMultiplier.Value);
+            double filler = 0;
+            Postfix_UnlockTechFunction(3, ref filler , 0, __instance.history);
+            Postfix_UnlockTechFunction(11, ref filler, 0, __instance.history);
+            Postfix_UnlockTechFunction(27, ref filler, 0, __instance.history);
         }
 
         public static bool UnlockTeckFunctionPost = true;
@@ -137,44 +137,85 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 Log.LogInfo($"value : {value}");
                 Log.LogInfo($"level : {level}");
             }
-            
+            int id = 0;
             switch (func)
             {
                 case 3:
                     GameMain.mainPlayer.mecha.walkSpeed = Configs.freeMode.mechaWalkSpeed;
-                    for ( int i = 2201; i <= 2208; i++)
+                    for ( id = 2201; id <= 2208; id++)
                     {
                         if (DEBUG)
                         {
-                            Log.LogInfo($"item Id = {i}");
-                            Log.LogInfo($"GameMain.history.techStates.curLevel = {__instance.techStates[i].curLevel}");
-                            Log.LogInfo($"GameMain.history.techStates.maxLevel = {__instance.techStates[i].maxLevel}");
+                            Log.LogInfo($"item Id = {id}");
+                            Log.LogInfo($"GameMain.history.techStates.curLevel      = {__instance.techStates[id].curLevel}");
+                            Log.LogInfo($"GameMain.history.techStates.maxLevel      = {__instance.techStates[id].maxLevel}");
+                            Log.LogInfo($"GameMain.history.techStates.unlocked      = {__instance.techStates[id].unlocked}");
+                            Log.LogInfo($"GameMain.history.techStates.unlockTick    = {__instance.techStates[id].unlockTick}");
+                            Log.LogInfo($"GameMain.history.techStates.hashNeeded    = {__instance.techStates[id].hashNeeded}");
+                            Log.LogInfo($"GameMain.history.techStates.hashUploaded  = {__instance.techStates[id].hashUploaded}");
+                            Log.LogInfo($"GameMain.history.techStates.uPointPerHash = {__instance.techStates[id].uPointPerHash}");
+                            Log.LogInfo($"LDB.techs.Select({id}).UnlockValues[0]    = {LDB.techs.Select(id).UnlockValues[0]}");
                         }
-                        if (!GameMain.history.techStates[i].unlocked) break;
-                        GameMain.mainPlayer.mecha.walkSpeed += (float)(LDB.techs.Select(i).UnlockValues[0] * Mecha_LAND_CONFIG.WalkSpeedUpgrageMultiplier.Value);
+                        if (GameMain.history.techStates[id].unlocked) GameMain.mainPlayer.mecha.walkSpeed += (float)(LDB.techs.Select(id).UnlockValues[0] * Mecha_LAND_CONFIG.WalkSpeedUpgrageMultiplier.Value);
+                    }
+                    break;
+                case 4:
+                    for (id = 2901; id <= 2903; id++)
+                    {
+                        if (DEBUG)
+                        {
+                            Log.LogInfo($"item Id = {id}");
+                            Log.LogInfo($"GameMain.history.techStates.curLevel      = {__instance.techStates[id].curLevel}");
+                            Log.LogInfo($"GameMain.history.techStates.maxLevel      = {__instance.techStates[id].maxLevel}");
+                            Log.LogInfo($"GameMain.history.techStates.unlocked      = {__instance.techStates[id].unlocked}");
+                            Log.LogInfo($"GameMain.history.techStates.unlockTick    = {__instance.techStates[id].unlockTick}");
+                            Log.LogInfo($"GameMain.history.techStates.hashNeeded    = {__instance.techStates[id].hashNeeded}");
+                            Log.LogInfo($"GameMain.history.techStates.hashUploaded  = {__instance.techStates[id].hashUploaded}");
+                            Log.LogInfo($"GameMain.history.techStates.uPointPerHash = {__instance.techStates[id].uPointPerHash}");
+                            Log.LogInfo($"LDB.techs.Select({id}).UnlockValues[0]    = {LDB.techs.Select(id).UnlockValues[0]}");
+                        }
+                        //if (GameMain.history.techStates[id].unlocked) GameMain.mainPlayer.mecha.walkSpeed += (float)(LDB.techs.Select(id).UnlockValues[0] * Mecha_LAND_CONFIG.WalkSpeedUpgrageMultiplier.Value);
                     }
                     break;
                 case 11:
-                    int id = 2903;
+                    id = 2903;
                     if (DEBUG)
                     {
                         Log.LogInfo($"item Id = {id}");
-                        Log.LogInfo($"GameMain.history.techStates.curLevel = {__instance.techStates[id].curLevel}");
-                        Log.LogInfo($"GameMain.history.techStates.maxLevel = {__instance.techStates[id].maxLevel}");
+                        Log.LogInfo($"GameMain.history.techStates.curLevel      = {__instance.techStates[id].curLevel}");
+                        Log.LogInfo($"GameMain.history.techStates.maxLevel      = {__instance.techStates[id].maxLevel}");
+                        Log.LogInfo($"GameMain.history.techStates.unlocked      = {__instance.techStates[id].unlocked}");
+                        Log.LogInfo($"GameMain.history.techStates.unlockTick    = {__instance.techStates[id].unlockTick}");
+                        Log.LogInfo($"GameMain.history.techStates.hashNeeded    = {__instance.techStates[id].hashNeeded}");
+                        Log.LogInfo($"GameMain.history.techStates.hashUploaded  = {__instance.techStates[id].hashUploaded}");
+                        Log.LogInfo($"GameMain.history.techStates.uPointPerHash = {__instance.techStates[id].uPointPerHash}");
+                        Log.LogInfo($"LDB.techs.Select({id}).UnlockValues[0]    = {LDB.techs.Select(id).UnlockValues[0]}");
                     }
-                    GameMain.mainPlayer.mecha.maxSailSpeed = Configs.freeMode.mechaSailSpeedMax * 2;
+                    GameMain.mainPlayer.mecha.maxSailSpeed = Configs.freeMode.mechaSailSpeedMax;
+                    if (__instance.techStates[id].unlocked) GameMain.mainPlayer.mecha.maxSailSpeed += Configs.freeMode.mechaSailSpeedMax;
                     break;
                 case 27:
                     GameMain.mainPlayer.mecha.maxWarpSpeed = Configs.freeMode.mechaWarpSpeedMax;
-                    if (DEBUG)
+
+                    for (id = 2905; id <= 2906; id++)
                     {
-                        Log.LogInfo($"item Id = {2905}");
-                        Log.LogInfo($"GameMain.history.techStates.curLevel = {__instance.techStates[2905].curLevel}");
-                        Log.LogInfo($"GameMain.history.techStates.maxLevel = {__instance.techStates[2905].maxLevel}");
-                    }
-                    GameMain.mainPlayer.mecha.maxWarpSpeed += (level - __instance.techStates[2905].curLevel + 1 ) * (3 * 40_000 * (float)Mecha_WARP_CONFIG.maxWarpSpeedMultiplier.Value);
-                    Log.LogInfo($"GameMain.mainPlayer.mecha.maxWarpSpeed = {GameMain.mainPlayer.mecha.maxWarpSpeed}");
-                    
+                        if (DEBUG)
+                        {
+                            Log.LogInfo($"item Id = {id}");
+                            Log.LogInfo($"GameMain.history.techStates.curLevel      = {__instance.techStates[id].curLevel}");
+                            Log.LogInfo($"GameMain.history.techStates.maxLevel      = {__instance.techStates[id].maxLevel}");
+                            Log.LogInfo($"GameMain.history.techStates.unlocked      = {__instance.techStates[id].unlocked}");
+                            Log.LogInfo($"GameMain.history.techStates.unlockTick    = {__instance.techStates[id].unlockTick}");
+                            Log.LogInfo($"GameMain.history.techStates.hashNeeded    = {__instance.techStates[id].hashNeeded}");
+                            Log.LogInfo($"GameMain.history.techStates.hashUploaded  = {__instance.techStates[id].hashUploaded}");
+                            Log.LogInfo($"GameMain.history.techStates.uPointPerHash = {__instance.techStates[id].uPointPerHash}");
+                            Log.LogInfo($"LDB.techs.Select({id}).UnlockValues[0]    = {LDB.techs.Select(id).UnlockValues[0]}");
+                        }
+                        float mechaWarpSpeed = (float)Mecha_WARP_CONFIG.maxWarpSpeedMultiplier.Value * 3 * 40_000;
+                        if (__instance.techStates[id].unlocked && id == 2905) GameMain.mainPlayer.mecha.maxWarpSpeed += mechaWarpSpeed;
+                        if (id == 2906) GameMain.mainPlayer.mecha.maxWarpSpeed += mechaWarpSpeed * (__instance.techStates[id].curLevel - 6);
+                        if (__instance.techStates[id].unlocked && id == 2906) GameMain.mainPlayer.mecha.maxWarpSpeed += mechaWarpSpeed;
+                    }                    
                     break;
             }
         }
@@ -290,7 +331,7 @@ namespace DSP_Speed_and_Consumption_Tweaks.Patches
                 Log.LogInfo("| In postfix_UITechNode_UpdateInfoComplete method Postfix |");
                 Log.LogInfo("+---------------------------------------------------------+");
             }
-            if (__instance == null) return;
+            if (__instance.destroyed) return;
             if (2201 <= __instance.techProto.ID && __instance.techProto.ID <= 2208){
                 var result = Regex.Replace(
                     __instance.unlockText.text, 

@@ -21,6 +21,7 @@ namespace DSP_Speed_and_Consumption_Tweaks
         private static readonly string LOGISTIC_SHIP_WARP = "Logistic Ships Warp Configuration";
         private static readonly string LOGISTIC_SHIP_SAIL = "Logistic Ships Cruise Configuration";
         private static readonly string LOGISTIC_DRONE_CONFIG = "Logistic Drones Configuration";
+        private static readonly string DYSONSPHERE_CONFIG = "Dyson sphere related Configuration";
         private static readonly string DARK_FOG_CONFIG = "Dark Fog Configuration";
         private static readonly string DEBUG_CONFIG = "Activate DEBUG messages";
         //private static readonly string UTILITY_SECTION = "Utility";
@@ -88,7 +89,12 @@ namespace DSP_Speed_and_Consumption_Tweaks
             public static ConfigEntry<double> DroneEnergyTransitMultiplier;
             public static ConfigEntry<double> DroneEnergyTakeOffMultiplier;
         }
-        
+        public static class DysonSphere_CONFIG
+        {
+            public static ConfigEntry<double> RocketSpeedMutliplier;
+            public static ConfigEntry<double> SolarSailBulletSpeedMutliplier;
+        }
+
         public static class Dark_Fog_CONFIG
         {
             public static ConfigEntry<double> maxEnemyAttackSpeedMultiplier;
@@ -230,10 +236,21 @@ namespace DSP_Speed_and_Consumption_Tweaks
                 new AcceptableValueRange<double>(0.0, 100.0), null ));
             //DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("9");
 
+            ////////////////////////////////
+            // Dyson Sphere Configuration //
+            ////////////////////////////////
+            DysonSphere_CONFIG.RocketSpeedMutliplier = config.Bind(DYSONSPHERE_CONFIG, "Rockets travel speed multiplier", 1.0,
+                new ConfigDescription("Travel speed off rockets towards Dyson Sphere node.",
+                new AcceptableValueRange<double>(0.1, 100.0), null));
+            DysonSphere_CONFIG.SolarSailBulletSpeedMutliplier = config.Bind(DYSONSPHERE_CONFIG, "Solar Sail Bullet speed multiplier", 1.0,
+                new ConfigDescription("Travel speed off Solar Sail Bullets towards Dyson Swarm node.",
+                new AcceptableValueRange<double>(0.1, 100.0), null));
+
+
             ////////////////////////////
             // Dark Fog Configuration //
             ////////////////////////////
-            Dark_Fog_CONFIG.maxEnemyAttackSpeedMultiplier = config.Bind(DARK_FOG_CONFIG, "Battle Unit speed travel speed multiplier", 1.0,
+            Dark_Fog_CONFIG.maxEnemyAttackSpeedMultiplier = config.Bind(DARK_FOG_CONFIG, "Battle Unit travel speed multiplier", 1.0,
                 new ConfigDescription("Ground and Space War unit movement speed Multiplier when traveling for assault.",
                 new AcceptableValueRange<double>(0.1, 10.0), null));
             Dark_Fog_CONFIG.maxEnemySpeedMultiplier = config.Bind(DARK_FOG_CONFIG, "Battle Unit speed Multiplier", 1.0,
