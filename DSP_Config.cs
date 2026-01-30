@@ -112,7 +112,8 @@ namespace DSP_Speed_and_Consumption_Tweaks
 
         public static class StarData_CONFIG
         {
-            public static ConfigEntry<float> flare_multiplier;
+            public static ConfigEntry<float> local_star_flare_multiplier;
+            public static ConfigEntry<float> distant_flare_multiplier;
         }
 
         internal static void Init(ConfigFile config)
@@ -280,9 +281,12 @@ namespace DSP_Speed_and_Consumption_Tweaks
             //////////////////////////////////
             // StarData CONFIG              //
             //////////////////////////////////
-            StarData_CONFIG.flare_multiplier = config.Bind(STARDATA_CONFIG, "Adjusts stars rendreing", 1.0f,
+            StarData_CONFIG.local_star_flare_multiplier = config.Bind(STARDATA_CONFIG, "Adjusts local rendreing", 1.0f,
+                new ConfigDescription("Adjust the flare multiplier of the local star.",
+                new AcceptableValueRange<float>(0.001f, 2.0f), null));
+            StarData_CONFIG.distant_flare_multiplier = config.Bind(STARDATA_CONFIG, "Adjusts stars rendreing", 1.0f,
                 new ConfigDescription("Adjust the flare multiplier of the stars.",
-                new AcceptableValueRange<float>(0.001f,10.0f), null));
+                new AcceptableValueRange<float>(0.001f, 2.0f), null));
 
         }
     }

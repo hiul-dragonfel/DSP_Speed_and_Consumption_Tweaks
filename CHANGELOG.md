@@ -1,3 +1,16 @@
+v 2.1.2 Added lerp to blend flares between local star and other stars
+
+v 2.1.1 Added a fix for GS2 to have less glaring halos around stars. The Higher the multiplier the less flare.
+        Tested with ConfigurationManager mod and all values are not dynamic you will need to reload for some to take effect.
+
+v 2.1.0 Added the possibility to change the travelling speed of the solar sail bullets and node rockets
+
+v 2.0.1 changes now affect loaded saves
+
+v 2.0.0 Update To make it work with the last game version.
+		Total rewrite.
+		Add Darkfog battle unit tweaks
+
 v 1.5.2 Fixed indexes and values for changing energy consumption of vessels and drones in v0.10.32.25779.
 
 v 1.5.1	Corrected an error in the code that removed tech level improvment to drone speed.
