@@ -24,6 +24,7 @@ namespace DSP_Speed_and_Consumption_Tweaks
         private static readonly string DYSONSPHERE_CONFIG = "Dyson sphere related Configuration";
         private static readonly string DARK_FOG_CONFIG = "Dark Fog Configuration";
         private static readonly string DEBUG_CONFIG = "Activate DEBUG messages";
+        private static readonly string STARDATA_CONFIG = "Adjust star rendering";
         //private static readonly string UTILITY_SECTION = "Utility";
 
         public enum units{
@@ -109,6 +110,11 @@ namespace DSP_Speed_and_Consumption_Tweaks
             public static ConfigEntry<bool> DEBUG;
         }
 
+        public static class StarData_CONFIG
+        {
+            public static ConfigEntry<float> flare_multiplier;
+        }
+
         internal static void Init(ConfigFile config)
         {
             ///////////////////////////////
@@ -148,14 +154,12 @@ namespace DSP_Speed_and_Consumption_Tweaks
                 new ConfigDescription("Multiplies the base max cruise speed for Icarus with this value (1.0 = vanilla speed). " +
                     "\nin game : " +
                     "\n40000 m is 1AU " +
-                    "\n60 AU is 1 LY (2400000 m)"
-                ,
+                    "\n60 AU is 1 LY (2400000 m)",
                 new AcceptableValueRange<double>(0.1, 100.0), null));
             //DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("1");
             Mecha_CRUISE_CONFIG.CruiseAccelerationRateMultiplier = config.Bind(MECHA_CRUISE_CONFIG, "Acceleration rate is 2% current speed / s", 1.0,
                 new ConfigDescription("Max cruise acceleration multiplier rate for Icarus.",
-                new AcceptableValueRange<double>(0.1, 100.0), null)
-            );
+                new AcceptableValueRange<double>(0.1, 100.0), null));
             //DSP_Speed_and_Consumption_Tweaks_Plugin.Log.LogInfo("1");
             Mecha_CRUISE_CONFIG.CruiseAccelerationEnergyCostMultiplier = config.Bind(MECHA_CRUISE_CONFIG, "Energy used to maintain cruise acceleration (Vanilla is 24000 )", 1.0,
                 new ConfigDescription("Icarus' Cruise Acceleration Energy Cost multiplier." +
@@ -169,7 +173,6 @@ namespace DSP_Speed_and_Consumption_Tweaks
             Mecha_WARP_CONFIG.maxWarpSpeedMultiplier = config.Bind(MECHA_WARP_CONFIG, "Maximum absolute warp speed (Vanilla is 1000000 M/s)", 1.0,
                 new ConfigDescription("Base max warp speed Multiplier of Icarus.",
                 new AcceptableValueRange<double>(0.1, 100.0), null));
-
             Mecha_WARP_CONFIG.warpStartPowerConsumptionMultiplier = config.Bind(MECHA_WARP_CONFIG, "Warp start power per speed (Vanilla is 1600)", 1.0,
                 new ConfigDescription("Warp start power per speed Multiplier for Icarus.",
                     new AcceptableValueRange<double>(0.0, 100.0), null));
@@ -241,10 +244,10 @@ namespace DSP_Speed_and_Consumption_Tweaks
             ////////////////////////////////
             DysonSphere_CONFIG.RocketSpeedMutliplier = config.Bind(DYSONSPHERE_CONFIG, "Rockets travel speed multiplier", 1.0,
                 new ConfigDescription("Travel speed off rockets towards Dyson Sphere node.",
-                new AcceptableValueRange<double>(0.1, 100.0), null));
+                new AcceptableValueRange<double>(1, 100.0), null));
             DysonSphere_CONFIG.SolarSailBulletSpeedMutliplier = config.Bind(DYSONSPHERE_CONFIG, "Solar Sail Bullet speed multiplier", 1.0,
                 new ConfigDescription("Travel speed off Solar Sail Bullets towards Dyson Swarm node.",
-                new AcceptableValueRange<double>(0.1, 100.0), null));
+                new AcceptableValueRange<double>(1, 100.0), null));
 
 
             ////////////////////////////
@@ -273,6 +276,14 @@ namespace DSP_Speed_and_Consumption_Tweaks
             Debug_CONFIG.DEBUG = config.Bind(DEBUG_CONFIG, "Debug messages :", false,
                 new ConfigDescription("Enable log debug messages",
                 new AcceptableValueList<bool>(true, false), null));
+
+            //////////////////////////////////
+            // StarData CONFIG              //
+            //////////////////////////////////
+            StarData_CONFIG.flare_multiplier = config.Bind(STARDATA_CONFIG, "Adjusts stars rendreing", 1.0f,
+                new ConfigDescription("Adjust the flare multiplier of the stars.",
+                new AcceptableValueRange<float>(0.001f,10.0f), null));
+
         }
     }
 }

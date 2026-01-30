@@ -13,6 +13,12 @@ If you have any suggestions your welcome to find me on discord
 here > https://discord.gg/BHCZ67hN
 or on the discord > DSP_Modding 
 
+I find https://thunderstore.io/c/dyson-sphere-program/p/starfi5h/ConfigurationManager/ a wonderfull mod that enables the modification of any value for Bepinex mods.
+You just need to press Ctrl+F1 to make the ConfigFiles window appear.
+
+v 2.1.1 Added a fix for GS2 to have less glaring halos around stars. The Higher the multiplier the less flare.
+        Tested with ConfigurationManager mod and all values are not dynamic you will need to reload for some to take effect.
+
 v 2.1.0 Added the possibility to change the travelling speed of the solar sail bullets and node rockets
 
 v 2.0.1 changes now affect loaded saves

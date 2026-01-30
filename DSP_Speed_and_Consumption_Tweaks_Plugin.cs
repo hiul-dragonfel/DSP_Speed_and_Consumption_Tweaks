@@ -453,6 +453,26 @@ namespace DSP_Speed_and_Consumption_Tweaks
                 }
                 Log.LogError(e.ToString());
             }
+
+            try
+            {
+                Log.LogInfo("+------------------------+");
+                Log.LogInfo("| Patching StarSimulator |");
+                Log.LogInfo("+------------------------+");
+                harmony.PatchAll(typeof(ExtraStarSimulator));
+            }
+            catch (Exception e)
+            {
+                Log.LogError("+-----------------------------------------+");
+                Log.LogError("| Patching StarSimulator Error |");
+                Log.LogError("+-----------------------------------------+");
+
+                foreach (var item in e.InnerException.Data)
+                {
+                    Log.LogError($"|    item : {item.ToString()}      |");
+                }
+                Log.LogError(e.ToString());
+            }
         }
         public void Start()
         {
